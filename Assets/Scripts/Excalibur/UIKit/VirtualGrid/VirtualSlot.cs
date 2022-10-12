@@ -22,7 +22,6 @@ namespace Excalibur
 
 	[RequireComponent(typeof(Image))]
 	[RequireComponent(typeof(Button))]
-    [DisallowMultipleComponent]
     [RequireComponent(typeof(RectTransform))]
     public abstract class VirtualSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 	{
@@ -183,21 +182,21 @@ namespace Excalibur
 		internal void Internal_OnSlotClicked()
         {
             VirtualGrid.OnVirtualSlotClicked(this);
-            OnSlotClickedHandler();
+            OnClickedHandler();
 			if (IsSelected)
 			{
-                OnSlotSelectedHandler();
+                OnSelectedHandler();
             }
 			else
 			{
-                OnSlotCancelSelectedHandler();
+                OnCancelSelectedHandler();
             }
         }
 
 		/// <summary>
 		/// 继承类鼠标点击的事件重写此方法，不重写可以通过grid中选择事件添加事务来触发
 		/// </summary>
-		protected virtual void OnSlotClickedHandler()
+		protected virtual void OnClickedHandler()
 		{
 
 		}
@@ -205,7 +204,7 @@ namespace Excalibur
 		/// <summary>
 		/// 选中时触发的事件
 		/// </summary>
-		protected virtual void OnSlotSelectedHandler()
+		protected virtual void OnSelectedHandler()
 		{
 
 		}
@@ -213,7 +212,7 @@ namespace Excalibur
 		/// <summary>
 		/// 取消选择时触发的事件
 		/// </summary>
-		protected virtual void OnSlotCancelSelectedHandler()
+		protected virtual void OnCancelSelectedHandler()
 		{
 
 		}
