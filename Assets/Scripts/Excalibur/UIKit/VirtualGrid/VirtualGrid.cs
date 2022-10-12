@@ -269,20 +269,8 @@ namespace Excalibur
                     m_PagePositions = new Vector2[m_PageCount];
                     for (int i = 0; i < m_PageCount; ++i)
                     {
-                        if (i == 0)
-                        {
-                            m_PagePositions[i][0] = IsVertical ? Rect.anchoredPosition.x : 0f;
-                            m_PagePositions[i][1] = IsVertical ? 0f : Rect.anchoredPosition.y;
-                        }
-                        else
-                        {
-                            m_PagePositions[i][0] = IsVertical
-                                            ? Rect.anchoredPosition.x
-                                            : -(m_Padding.left + ((SlotSize[0] + m_Spacing.x) * m_RowAndColumn[1]) * i - m_Spacing.x * 0.5f);
-                            m_PagePositions[i][1] = IsVertical
-                                            ? m_Padding.top - m_Padding.bottom + ((SlotSize[1] + m_Spacing.y) * m_RowAndColumn[0]) * i - m_Spacing.y * 0.5f
-                                            : Rect.anchoredPosition.y;
-                        }
+                        m_PagePositions[i][0] = IsVertical ? Rect.anchoredPosition.x : -(SlotSize[0] + m_Spacing.x) * m_RowAndColumn[1] * i;
+                        m_PagePositions[i][1] = IsVertical ? (SlotSize[1] + m_Spacing.y) * m_RowAndColumn[0] * i : Rect.anchoredPosition.y;
                     }
                     m_CurrentPage = 0;
                     m_LastPage = -1;
