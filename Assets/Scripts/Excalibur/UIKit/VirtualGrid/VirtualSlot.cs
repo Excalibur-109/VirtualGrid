@@ -183,13 +183,37 @@ namespace Excalibur
 		internal void Internal_OnSlotClicked()
         {
             VirtualGrid.OnVirtualSlotClicked(this);
-            OnSlotClickedEvent();
+            OnSlotClickedHandler();
+			if (IsSelected)
+			{
+                OnSlotSelectedHandler();
+            }
+			else
+			{
+                OnSlotCancelSelectedHandler();
+            }
         }
 
 		/// <summary>
 		/// 继承类鼠标点击的事件重写此方法，不重写可以通过grid中选择事件添加事务来触发
 		/// </summary>
-		protected virtual void OnSlotClickedEvent()
+		protected virtual void OnSlotClickedHandler()
+		{
+
+		}
+
+		/// <summary>
+		/// 选中时触发的事件
+		/// </summary>
+		protected virtual void OnSlotSelectedHandler()
+		{
+
+		}
+
+		/// <summary>
+		/// 取消选择时触发的事件
+		/// </summary>
+		protected virtual void OnSlotCancelSelectedHandler()
 		{
 
 		}

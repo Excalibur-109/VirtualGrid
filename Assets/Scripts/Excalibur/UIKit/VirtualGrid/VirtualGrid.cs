@@ -36,6 +36,7 @@ namespace Excalibur
     [RequireComponent(typeof(RectTransform))]
     public sealed class VirtualGrid : MonoBehaviour
     {
+        public event OnSelect onClickedEvent;
         public event OnSelect onSelectEvent;
         public event OnSelect onCancelSelectEvent;
         public event OnAddItem onAddItemEvent;
@@ -427,11 +428,18 @@ namespace Excalibur
         internal void OnVirtualSlotClicked(VirtualSlot slot)
         {
             OnVirtualSlotClickedBase(slot);
-            if (onSelectEvent != null)
+            if (onClickedEvent != null)
             {
-                onSelectEvent.Invoke(slot);
+                onClickedEvent.Invoke(slot);
             }
-            if (!slot.IsSelected)
+            if (slot.IsSelected)
+            {
+                if (onSelectEvent != null)
+                {
+                    onSelectEvent.Invoke(slot);
+                }
+            }
+            else
             {
                 if (onCancelSelectEvent != null)
                 {
