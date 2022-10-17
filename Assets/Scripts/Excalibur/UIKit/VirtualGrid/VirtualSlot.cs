@@ -21,17 +21,31 @@ namespace Excalibur
 	}
 
 	[RequireComponent(typeof(Image))]
-	[RequireComponent(typeof(Button))]
     [RequireComponent(typeof(RectTransform))]
-    public abstract class VirtualSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+    public abstract class VirtualSlot : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 	{
 		[SerializeField]
 		private GameObject m_Select;
+        private bool interactable = true;
+
+        [SerializeField]
+        private VirtualGrid m_VirtualGrid;
+        internal VirtualGrid virtualGrid
+        {
+            get
+            {
+                if (m_VirtualGrid == null)
+                    m_VirtualGrid = transform.parent.GetComponent<VirtualGrid>();
+                return m_VirtualGrid;
+            }
+        }
+        private Image m_Background;
+        protected Image background { get { if (m_Background == null) m_Background = GetComponent<Image>(); return m_Background; } }
 
         public bool IsSelected 
-		{ 
+		{
 			// get 获取是否选中
-			get { return VirtualGrid.SelectedData != default(IItemData) && ReferenceEquals(ItemData, VirtualGrid.SelectedData); }
+			get { return virtualGrid.IsSlotSelected(this); }
 			// set 设置选中效果
 			set 
 			{
@@ -52,7 +66,7 @@ namespace Excalibur
 
 		public IItemData ItemData
 		{
-			get { return VirtualGrid.Internal_GetItemData(m_DataIndex); }
+			get { return virtualGrid.Internal_GetItemData(m_DataIndex); }
 		}
 
         private VirtualSlotEffectType m_PointerEnterEffectType;
@@ -75,8 +89,8 @@ namespace Excalibur
 
 		public Vector2 AnchoredPosition { get { return Rect.anchoredPosition; } }
 
-		public float Width { get { return VirtualGrid.SlotSize[0]; } }
-		public float Height { get { return VirtualGrid.SlotSize[1]; } }
+		public float Width { get { return virtualGrid.SlotSize[0]; } }
+		public float Height { get { return virtualGrid.SlotSize[1]; } }
 
 		private Vector3[] m_Corners;
 		public Vector3[] Corners
@@ -90,35 +104,7 @@ namespace Excalibur
 			}
 		}
 
-        private VirtualGrid m_VirtualGrid;
-		internal VirtualGrid VirtualGrid 
-		{ 
-			get 
-			{ 
-				if (m_VirtualGrid == null)
-                    m_VirtualGrid = transform.parent.GetComponent<VirtualGrid>();
-				return m_VirtualGrid;
-			}
-		}
-        private Image m_Background;
-		protected Image background 
-		{ get { if (m_Background == null) m_Background = GetComponent<Image>(); return m_Background; } }
-
-		private Button m_Button;
-		protected Button button
-		{
-			get 
-			{
-				if (m_Button == null) 
-				{
-					m_Button = GetComponent<Button>();
-                    m_Button.transition = Selectable.Transition.None;
-                    m_Button.onClick.AddListener(Internal_OnSlotClicked);
-				}
-				return m_Button;
-			}
-		}
-        private Vector3[] ViewPortWorldCorners { get { return VirtualGrid.ViewPortWorldCorners; } }
+        private Vector3[] ViewPortWorldCorners { get { return virtualGrid.ViewPortWorldCorners; } }
 		private int m_DataIndex;
 		internal int DataIndex 
 		{
@@ -126,7 +112,7 @@ namespace Excalibur
 			set 
 			{
                 m_DataIndex = value;
-                if (!VirtualGrid.Internal_IndexValid(m_DataIndex))
+                if (!virtualGrid.Internal_IndexValid(m_DataIndex))
                 {
                     Internal_SetActive(false);
                 }
@@ -140,12 +126,6 @@ namespace Excalibur
 
         protected virtual void Awake() 
 		{
-			if (m_Button == null)
-            {
-                m_Button = GetComponent<Button>();
-                m_Button.transition = Selectable.Transition.None;
-                m_Button.onClick.AddListener(Internal_OnSlotClicked);
-            }
         }
 
 		protected virtual void OnEnable() { }
@@ -181,7 +161,7 @@ namespace Excalibur
 		/// </summary>
 		internal void Internal_OnSlotClicked()
         {
-            VirtualGrid.OnVirtualSlotClicked(this);
+            virtualGrid.OnVirtualSlotClicked(this);
             OnClickedHandler();
 			if (IsSelected)
 			{
@@ -215,7 +195,16 @@ namespace Excalibur
 		protected virtual void OnCancelSelectedHandler()
 		{
 
-		}
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+			if (!interactable)
+			{
+				return;
+			}
+			Internal_OnSlotClicked();
+        }
 
         public virtual void OnPointerEnter(PointerEventData eventData)
 		{
@@ -249,7 +238,7 @@ namespace Excalibur
         internal bool Internal_AboveViewPort()
 		{
 			Vector3[] corners = Corners;
-			if (VirtualGrid.IsVertical)
+			if (virtualGrid.IsVertical)
 			{
 				if (corners[0].y > ViewPortWorldCorners[1].y)
 				{
@@ -270,7 +259,7 @@ namespace Excalibur
         internal bool Internal_BelowViewPort()
         {
             Vector3[] corners = Corners;
-            if (VirtualGrid.IsVertical)
+            if (virtualGrid.IsVertical)
             {
                 if (corners[1].y < ViewPortWorldCorners[0].y)
                 {
@@ -294,7 +283,7 @@ namespace Excalibur
         internal bool Internal_PartInViewPort()
         {
             Vector3[] corners = Corners;
-            if (VirtualGrid.IsVertical)
+            if (virtualGrid.IsVertical)
             {
                 if ((corners[1].y >= ViewPortWorldCorners[0].y && corners[0].y < ViewPortWorldCorners[0].y)
                  || (corners[0].y <= ViewPortWorldCorners[1].y && corners[1].y > ViewPortWorldCorners[1].y))
@@ -329,7 +318,7 @@ namespace Excalibur
 		/// </summary>
 		protected void SetInteractable(bool interactable)
 		{
-			m_Button.interactable = interactable;
+			this.interactable = interactable;
 		}
-    }
+	}
 }

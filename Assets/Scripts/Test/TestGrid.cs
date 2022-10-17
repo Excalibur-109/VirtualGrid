@@ -82,7 +82,7 @@ public class TestGrid : MonoBehaviour
         {
             TestSlotData data = gird.SelectedData as TestSlotData;
             list.Remove(data);
-            gird.OnDeleteSelectedData();
+            gird.OnDeleteCurrentSelectedData();
         }
     }
 
